@@ -1,0 +1,25 @@
+# ── College RAG – Configuration ─────────────────────────────────────
+# All values below can be overridden by environment variables with the
+# same name (uppercase).  Env vars take precedence over this file.
+
+# Embedding model (sentence-transformers name)
+embedding_model: "BAAI/bge-base-en-v1.5"
+
+# Default number of results to return
+default_k: 5
+
+# Paths (relative to project root)
+index_path: "data/faiss.index"
+metadata_path: "data/metadata.pkl"
+courses_path: "data/courses.json"
+log_path: "logs/queries.log"
+
+# Search settings
+search_mode: "hybrid"        # "hybrid" | "vector"
+fusion_strategy: "weighted"  # "weighted" | "rrf"
+fusion_alpha: 0.7
+fusion_beta: 0.3
+
+# Server
+host: "127.0.0.1"
+port: 8000
