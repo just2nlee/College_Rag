@@ -1,2 +1,22 @@
 
+# Secrets
 .env
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pycache
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Logs
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
