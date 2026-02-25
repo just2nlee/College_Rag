@@ -36,6 +36,8 @@ _RECORD_TEMPLATE = textwrap.dedent("""\
     [{course_code}] {title}
     Department: {department}
     Source: {source}
+    Instructor: {instructor}
+    Meeting Times: {meeting_times}
     Description: {description}
     Prerequisites: {prerequisites}
     ---""")
@@ -51,11 +53,15 @@ def assemble_context(records: List[Dict[str, Any]]) -> str:
     for rec in records:
         desc = (rec.get("description") or "")
         prereq = rec.get("prerequisites") or "None listed"
+        instructor = rec.get("instructor") or "Not listed"
+        meeting = rec.get("meeting_times") or "Not listed"
         block = _RECORD_TEMPLATE.format(
             course_code=rec.get("course_code", ""),
             title=rec.get("title", ""),
             department=rec.get("department", ""),
             source=rec.get("source", ""),
+            instructor=instructor,
+            meeting_times=meeting,
             description=desc,
             prerequisites=prereq,
         )
@@ -75,6 +81,8 @@ _SYSTEM_PROMPT = textwrap.dedent("""\
     You are a helpful academic advisor for Brown University.
     Answer the user's question using ONLY the course information provided below.
     Cite course codes (e.g. CSCI0150) when referencing specific courses.
+    If the context includes meeting times, instructor names, or prerequisites,
+    use that information in your answer.
     If the answer is not in the provided context, say so clearly.
     Be concise and factual.""")
 
@@ -88,65 +96,6 @@ def build_prompt(query: str, context: str) -> List[Dict[str, str]]:
 
 
 # ── LLM backends ────────────────────────────────────────────────────
-
-def _try_ollama(messages: List[Dict[str, str]]) -> Optional[str]:
-    """Call a local Ollama instance if available."""
-    try:
-        import requests
-
-        # Try common Ollama models in order
-        for model in ("llama3", "mistral", "llama2"):
-            try:
-                resp = requests.post(
-                    "http://localhost:11434/api/chat",
-                    json={"model": model, "messages": messages, "stream": False},
-                    timeout=60,
-                )
-                if resp.ok:
-                    data = resp.json()
-                    answer = data.get("message", {}).get("content", "")
-                    if answer:
-                        logger.info("Ollama (%s) generated answer", model)
-                        return answer
-            except Exception:
-                continue
-    except ImportError:
-        pass
-    return None
-
-
-def _try_huggingface(messages: List[Dict[str, str]]) -> Optional[str]:
-    """Call HuggingFace Inference API (free tier)."""
-    api_key = os.environ.get("HF_API_TOKEN") or os.environ.get("HUGGINGFACE_API_KEY")
-    if not api_key:
-        return None
-    try:
-        import requests
-
-        # Use a small chat model available on free tier
-        url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-        prompt = "\n".join(
-            f"{'<s>' if m['role'] == 'system' else ''}[INST] {m['content']} [/INST]"
-            if m["role"] != "assistant" else m["content"]
-            for m in messages
-        )
-        resp = requests.post(
-            url,
-            headers={"Authorization": f"Bearer {api_key}"},
-            json={"inputs": prompt, "parameters": {"max_new_tokens": 512}},
-            timeout=60,
-        )
-        if resp.ok:
-            data = resp.json()
-            if isinstance(data, list) and data:
-                answer = data[0].get("generated_text", "")
-                if answer:
-                    logger.info("HuggingFace API generated answer")
-                    return answer
-    except Exception as exc:
-        logger.debug("HuggingFace API failed: %s", exc)
-    return None
-
 
 def _try_openai(messages: List[Dict[str, str]]) -> Optional[str]:
     """Call OpenAI API if OPENAI_API_KEY is set."""
@@ -192,7 +141,7 @@ def generate_answer(
     messages = build_prompt(query, context)
 
     # Try backends in priority order
-    for backend in (_try_ollama, _try_huggingface, _try_openai):
+    for backend in (_try_openai):
         answer = backend(messages)
         if answer:
             return answer, context

@@ -105,6 +105,8 @@ class CourseResult(BaseModel):
     department: str
     similarity_score: float
     source: str
+    instructor: Optional[str] = None
+    meeting_times: Optional[str] = None
 
 
 class QueryResponse(BaseModel):
@@ -183,6 +185,8 @@ async def post_query(body: QueryRequest):
             department=r.get("department", ""),
             similarity_score=round(r.get("similarity_score", 0.0), 4),
             source=r.get("source", ""),
+            instructor=r.get("instructor"),
+            meeting_times=r.get("meeting_times"),
         )
         for r in result.get("records", [])
     ]

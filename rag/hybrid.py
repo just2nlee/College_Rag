@@ -143,11 +143,14 @@ def hybrid_search(
     else:
         merged = _weighted_sum(sem_results, kw_results, alpha=alpha, beta=beta)
 
-    # Ensure every result has all three score fields
+    # Ensure every result has all score + metadata fields
     for r in merged:
         r.setdefault("similarity_score", 0.0)
         r.setdefault("keyword_score", 0.0)
         r.setdefault("final_score", 0.0)
+        r.setdefault("instructor", None)
+        r.setdefault("meeting_times", None)
+        r.setdefault("prerequisites", None)
 
     logger.info(
         "Hybrid search (%s): %d semantic + %d keyword → %d merged → returning top %d",
@@ -180,5 +183,8 @@ def vector_search(
     )
     for r in results:
         r.setdefault("keyword_score", 0.0)
+        r.setdefault("instructor", None)
+        r.setdefault("meeting_times", None)
+        r.setdefault("prerequisites", None)
         r["final_score"] = r.get("similarity_score", 0.0)
     return results

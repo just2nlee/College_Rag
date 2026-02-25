@@ -14,3 +14,6 @@ fastapi>=0.100.0
 uvicorn[standard]>=0.20.0
 pyyaml>=6.0
 python-dotenv>=1.0.0
+
+# ── Feature 4: Streamlit frontend ──
+streamlit>=1.30.0

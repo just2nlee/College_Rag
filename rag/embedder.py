@@ -32,16 +32,24 @@ def _get_model(model_name: str = DEFAULT_MODEL):
 def build_embed_text(record: dict) -> str:
     """Build the dense text representation for a single course record.
 
-    Format: "[course_code] [title] – [department]. [description].
-             Prerequisites: [prerequisites]."
+    Includes instructor and meeting-time information so that schedule-
+    related queries (e.g. "Friday after 3 pm") can be matched.
     """
     code = record.get("course_code", "")
     title = record.get("title", "")
     dept = record.get("department", "")
     desc = record.get("description", "")
     prereq = record.get("prerequisites") or ""
+    instructor = record.get("instructor") or ""
+    meeting = record.get("meeting_times") or ""
 
-    parts = [f"{code} {title} – {dept}.", desc + "."]
+    parts = [f"{code} {title} – {dept}."]
+    if instructor:
+        parts.append(f"Instructor: {instructor}.")
+    if meeting:
+        parts.append(f"Meeting times: {meeting}.")
+    if desc:
+        parts.append(desc + ".")
     if prereq:
         parts.append(f"Prerequisites: {prereq}.")
     return " ".join(parts)
