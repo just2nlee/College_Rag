@@ -84,6 +84,8 @@ _SYSTEM_PROMPT = textwrap.dedent("""\
     If the context includes meeting times, instructor names, or prerequisites,
     use that information in your answer.
     If the answer is not in the provided context, say so clearly.
+    Do not recommend courses that are not in the context.
+    Do not make up any information that is not in the context.  
     Be concise and factual.""")
 
 
@@ -140,15 +142,13 @@ def generate_answer(
     context = assemble_context(retrieved_records)
     messages = build_prompt(query, context)
 
-    # Try backends in priority order
-    for backend in (_try_openai):
-        answer = backend(messages)
-        if answer:
-            return answer, context
+    answer = _try_openai(messages)
+    if answer:
+        return answer, context
 
     # Fallback: no LLM available
     logger.warning(
-        "No LLM backend available (Ollama / HuggingFace / OpenAI). "
+        "No LLM backend available (OpenAI). "
         "Returning retrieval-only results."
     )
     fallback = (
