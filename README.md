@@ -10,24 +10,24 @@ A Retrieval-Augmented Generation (RAG) system for exploring Brown University cou
 ┌─────────────────────────────────────────────────────────────────────┐
 │                          ETL Pipeline                               │
 │   run_pipeline.py                                                   │
-│   ┌──────────────┐    ┌──────────────────┐    ┌─────────────────┐  │
-│   │ scraper_cab  │    │ scraper_bulletin  │    │   normalize.py  │  │
-│   │  (JSON API)  │───▶│   (HTML/lxml)    │───▶│  unified schema │  │
-│   └──────────────┘    └──────────────────┘    └────────┬────────┘  │
+│   ┌──────────────┐     ┌──────────────────┐    ┌─────────────────┐  │
+│   │ scraper_cab  │     │ scraper_bulletin │    │  normalize.py   │  │
+│   │  (JSON API)  │───▶│   (HTML/lxml)    │───▶│ unified schema  │  │
+│   └──────────────┘     └──────────────────┘    └────────┬────────┘  │
 │                                                         │           │
-│                                              data/courses.json      │
+│                                                  data/courses.json  │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         Vector Store Build                          │
 │   run_rag.py --build                                                │
-│   ┌────────────────────────────┐    ┌───────────────────────────┐  │
-│   │  embedder.py               │    │  keyword_search.py        │  │
-│   │  BAAI/bge-base-en-v1.5     │    │  BM25Okapi                │  │
-│   │  768-d, L2-normed          │    │  (rank-bm25)              │  │
-│   └────────────┬───────────────┘    └──────────────┬────────────┘  │
-│                │                                    │               │
+│   ┌────────────────────────────┐    ┌───────────────────────────┐   │
+│   │  embedder.py               │    │  keyword_search.py        │   │
+│   │  BAAI/bge-base-en-v1.5     │    │  BM25Okapi                │   │
+│   │  768-d, L2-normed          │    │  (rank-bm25)              │   │
+│   └────────────┬───────────────┘    └──────────────┬────────────┘   │
+│                │                                   │                │
 │   data/faiss.index                    (in-memory, rebuilt on load)  │
 │   data/metadata.pkl                                                 │
 └─────────────────────────────────────────────────────────────────────┘
@@ -36,12 +36,12 @@ A Retrieval-Augmented Generation (RAG) system for exploring Brown University cou
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         FastAPI Backend                             │
 │   app.py  (uvicorn, port 8000)                                      │
-│   ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐   │
-│   │ POST /query │  │  GET /health │  │    GET /evaluate        │   │
-│   │  hybrid.py  │  │ index stats  │  │  p50/p95/p99 latency    │   │
-│   │ generator.py│  └──────────────┘  └────────────────────────┘   │
-│   │ (GPT-4o-mini│                                                   │
-│   │  via OpenAI)│                                                   │
+│   ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐     │
+│   │ POST /query │  │  GET /health │  │    GET /evaluate       │     │
+│   │  hybrid.py  │  │ index stats  │  │  p50/p95/p99 latency   │     │ 
+│   │ generator.py│  └──────────────┘  └────────────────────────┘     │
+│   │(GPT-4o-mini │                                                   │
+│   │ via OpenAI) │                                                   │
 │   └─────────────┘                                                   │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
@@ -50,7 +50,7 @@ A Retrieval-Augmented Generation (RAG) system for exploring Brown University cou
 │                       Streamlit Frontend                            │
 │   frontend/app.py  (port 8501)                                      │
 │   Query input · Department dropdown · Source filter                 │
-│   LLM answer box · Results table · Latency badge                   │
+│   LLM answer box · Results table · Latency badge                    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
