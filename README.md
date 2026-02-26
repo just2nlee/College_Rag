@@ -111,7 +111,6 @@ Open **http://localhost:8501** in your browser.
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `OPENAI_API_KEY` | **Yes** | — | OpenAI key for GPT-4o-mini generation |
-| `HF_API_TOKEN` | No | — | HuggingFace Inference API token (fallback LLM) |
 | `EMBEDDING_MODEL` | No | `BAAI/bge-base-en-v1.5` | Sentence-transformers model name |
 | `DEFAULT_K` | No | `5` | Number of results to return |
 | `INDEX_PATH` | No | `data/faiss.index` | Path to FAISS binary index |
@@ -173,20 +172,35 @@ All variables can also be set in `config.yaml` (env vars take precedence).
 ## Design Decisions & Trade-offs
 
 ### Hybrid Search (Vector + BM25)
-**Decision:** Combine FAISS inner-product search with BM25Okapi via a weighted sum (α=0.7 semantic, β=0.3 keyword).  
-**Trade-off:** Pure vector search struggles with exact course code lookups (e.g. `CSCI0320`). BM25 excels here but fails on paraphrased queries. Hybrid covers both. RRF fusion is also supported but weighted sum performed better on manual evaluation.
+**Decision:** Combine two different search methods, semantic search (FAISS) and keyword search (BM25),and blend their results.
+
+**Why two methods?** Think of it like having two librarians helping you find books:
+- **Semantic search** understands *meaning*. If you ask "classes about AI," it knows to include courses about "machine learning" and "neural networks" even if those exact words aren't in your query.
+- **Keyword search (BM25)** matches *exact words*. If you search for "CSCI0320," it finds that exact course code instantly.
+
+Neither method alone is perfect. Semantic search might miss an exact course code you typed. Keyword search won't understand that "intro programming" means the same as "beginner coding." By combining both (70% semantic, 30% keyword), the system handles both types of queries well.
 
 ### Embedding Model: BAAI/bge-base-en-v1.5
-**Decision:** 768-d open-source retrieval-optimised encoder, L2-normalised for cosine similarity via inner product.  
-**Trade-off:** Larger models (e.g. `bge-large`, `text-embedding-3-large`) improve retrieval quality but increase index build time and memory. `bge-base` provides a strong quality/speed balance for a 504-document corpus.
+**Decision:** Use a free, open-source AI model to convert course descriptions into numerical "fingerprints" (embeddings) that capture their meaning.
+
+**Why this model?** Embeddings are how the system understands similarity. When you search "machine learning courses," the system compares your query's fingerprint against every course's fingerprint to find the closest matches.
+
+- **Why `bge-base` specifically?** It's a well-tested model designed specifically for search tasks (not general chat), so it's better at finding relevant documents. It's also free and runs locally—no API calls needed.
+- **Why not a bigger model?** Larger models (like `bge-large` or OpenAI's `text-embedding-3-large`) are slightly more accurate but take longer to process and use more memory. For ~500 courses, `bge-base` is plenty accurate and keeps searches fast (under 50ms).
 
 ### In-process FAISS Index
 **Decision:** Load the index into memory at FastAPI startup rather than using a hosted vector DB.  
 **Trade-off:** Zero infrastructure overhead, sub-millisecond search latency. Does not scale beyond ~1M documents without IVF indexing or a dedicated vector DB (Pinecone, Weaviate, Qdrant).
 
-### LLM Backend Hierarchy
-**Decision:** Try Ollama (local) → HuggingFace → OpenAI in order.  
-**Trade-off:** Ollama has zero cost and full data privacy but requires a local GPU. OpenAI (GPT-4o-mini) is the reliable fallback but has per-token cost (~$0.15/1M output tokens).
+### LLM Backend: OpenAI GPT-4o-mini
+**Decision:** Use OpenAI's GPT-4o-mini model exclusively for generating natural-language answers.
+
+**Why GPT-4o-mini?** After the system finds relevant courses (via hybrid search), an LLM reads those results and writes a helpful, human-friendly answer. GPT-4o-mini is:
+- **Fast:** Responses typically arrive in 1-2 seconds.
+- **Affordable:** At ~$0.15 per million output tokens, a typical query costs a fraction of a cent.
+- **Reliable:** OpenAI's API has high uptime and consistent quality.
+
+**Why not local models?** Running an LLM locally (e.g., via Ollama) would eliminate API costs and keep data private, but requires a powerful GPU and more complex setup. For this project, the simplicity and reliability of OpenAI outweighed those benefits.
 
 ### Streamlit Frontend
 **Decision:** Streamlit over React for minimal setup (no build step, no Node.js required).  
