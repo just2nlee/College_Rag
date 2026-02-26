@@ -173,7 +173,7 @@ All variables can also be set in `config.yaml` (env vars take precedence).
 ## Design Decisions & Trade-offs
 
 ### Hybrid Search (Vector + BM25)
-**Decision:** Combine two different search methods, semantic search (FAISS) and keyword search (BM25),and blend their results.
+**Decision:** Combine two different search methods, semantic search (FAISS) and keyword search (BM25), and blend their results.
 
 **Why two methods?** Think of it like having two librarians helping you find books:
 - **Semantic search** understands *meaning*. If you ask "classes about AI," it knows to include courses about "machine learning" and "neural networks" even if those exact words aren't in your query.
