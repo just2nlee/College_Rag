@@ -114,19 +114,3 @@ Currently, adding a new course requires a full rebuild. Implement an incremental
 
 ### 4.7 IVF Index for Scale
 `IndexFlatIP` performs exact search in O(N) time. At >100k documents, switch to `IndexIVFFlat` (inverted file index) which reduces search time to O(N/n_lists) with a small recall trade-off. At 504 documents this is unnecessary, but is the correct upgrade path.
-
----
-
-## 5. Adding a Third Data Source
-
-The pipeline is designed for extension. Adding a new source (e.g. Canvas LMS) requires changes only in the ETL layer:
-
-1. Create `etl/scraper_canvas.py` with a `scrape() -> list[dict]` function returning raw dicts.
-2. Map fields to the unified schema in `etl/normalize.py` → add a `"CANVAS"` branch in `normalize_record()`.
-3. Import and call `scraper_canvas.scrape()` in `etl/pipeline.py` alongside CAB and Bulletin.
-4. Re-run `python run_pipeline.py` to regenerate `data/courses.json`.
-5. Re-run `python run_rag.py --build` to rebuild the FAISS index.
-
-No changes are needed in `rag/`, `app.py`, or `frontend/app.py`. The source filter in the frontend already accepts any string value — add `"CANVAS"` to the radio options in `frontend/app.py` to expose it in the UI.
-
-The schema contract is enforced by `etl/models.py` (`CourseRecord` dataclass), which validates required fields and provides sane defaults for optional ones.
