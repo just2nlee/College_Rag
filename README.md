@@ -139,21 +139,14 @@ All variables can also be set in `config.yaml` (env vars take precedence).
 ---
 
 ### 2. Machine learning
-**Query:** `machine learning`
+**Query:** `What are some machine learning courses that are available?`
 
 **Expected answer excerpt:**
 > BHDS2130 (Methods III: Statistical Machine Learning), CSCI1410 (Artificial Intelligence), and APMA2070 (Deep Learning for Scientists & Engineers) cover machine learning topics...
 
 ---
 
-### 3. Department-filtered query
-**Query:** `programming` + **Department filter:** `Computer Science`
-
-**Expected:** All results have `department = "Computer Science"`.
-
----
-
-### 4. Schedule-aware query
+### 3. Schedule-aware query
 **Query:** `List all CAB courses taught on Fridays after 3 pm related to machine learning`
 
 **Expected answer excerpt:**
