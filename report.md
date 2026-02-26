@@ -30,7 +30,7 @@ At query time `rag/hybrid.py` runs both legs:
 Optional post-filters by `department` (substring) and `source` (exact) are applied after fusion, before slicing to `top_k`.
 
 ### 1.4 Generation
-`rag/generator.py` assembles the top-k records into a structured context block (course code, title, department, source, instructor, meeting times, description, prerequisites). This context is inserted into a chat prompt with a system instruction to cite course codes and use schedule information when present. The prompt is sent to GPT-4o-mini (OpenAI), with local Ollama and HuggingFace as fallback backends. The function returns `(answer, context)`.
+`rag/generator.py` assembles the top-k records into a structured context block (course code, title, department, source, instructor, meeting times, description, prerequisites). This context is inserted into a chat prompt with a system instruction to cite course codes and use schedule information when present. The prompt is sent to GPT-4o-mini (OpenAI). The function returns `(answer, context)`.
 
 ---
 
