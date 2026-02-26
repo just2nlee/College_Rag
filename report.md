@@ -85,10 +85,10 @@ The dominant latency factor is the OpenAI API call. Retrieval itself is fast (<1
 - **Schedule queries** (e.g. `courses on Fridays after 3pm`): Improved after embedding `meeting_times` into the index text. LLM correctly filters by day/time when the field is populated. CAB records have schedule data; Bulletin records do not, which limits recall for cross-source schedule queries.
 
 ### Observed Failure Modes
-1. **Missing schedule data in Bulletin records** — 208 Bulletin courses have `meeting_times = null`, so schedule-filtered queries only return CAB courses reliably.
-2. **Token budget hallucination** — when the context fills the token budget and gets truncated mid-sentence, GPT-4o-mini occasionally fabricates completions. Mitigation: reduce `DEFAULT_K` or increase `max_tokens`.
-3. **Department name mismatch** — CAB uses abbreviations (`CSCI`) while Bulletin uses full names (`Computer Science`), so a filter for `"CSCI"` misses Bulletin entries. Workaround: use the Streamlit dropdown which lists actual values.
-4. **BM25 tokenisation on hyphenated codes** — `CSCI-0320` vs `CSCI0320` can cause a miss. The current normaliser strips hyphens at ETL time.
+1. **Missing schedule data in Bulletin records:** 208 Bulletin courses have `meeting_times = null`, so schedule-filtered queries only return CAB courses reliably.
+2. **Token budget hallucination:** When the context fills the token budget and gets truncated mid-sentence, GPT-4o-mini occasionally fabricates completions. Mitigation: reduce `DEFAULT_K` or increase `max_tokens`.
+3. **Department name mismatch:** CAB uses abbreviations (`CSCI`) while Bulletin uses full names (`Computer Science`), so a filter for `"CSCI"` misses Bulletin entries. Workaround: use the Streamlit dropdown which lists actual values.
+4. **BM25 tokenisation on hyphenated codes:** `CSCI-0320` vs `CSCI0320` can cause a miss. The current normaliser strips hyphens at ETL time.
 
 ---
 
