@@ -1,6 +1,9 @@
 # Brown University Course RAG
 
-Here I've built a Retrieval-Augmented Generation (RAG) system for exploring Brown University course offerings. It scrapes course data from CAB and the Bulletin, builds a hybrid semantic + keyword search index, exposes a FastAPI backend, and provides a Streamlit frontend for natural-language course queries by leveraging GPT-4o-mini.
+Here I've built a Retrieval-Augmented Generation (RAG) system for exploring Brown University course offerings. It scrapes course data from two sources:
+● Courses @ Brown (CAB): https://cab.brown.edu/
+● Brown University Bulletin: https://bulletin.brown.edu/
+The application also builds a hybrid semantic + keyword search index, exposes a FastAPI backend, and provides a Streamlit frontend for natural-language course queries by leveraging GPT-4o-mini.
 
 ---
 
