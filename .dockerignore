@@ -1,0 +1,12 @@
+.venv/
+.git/
+.env
+__pycache__/
+*.pyc
+*.pyo
+logs/
+frontend/
+requirements-dev.txt
+report.md
+README.md
+*.md

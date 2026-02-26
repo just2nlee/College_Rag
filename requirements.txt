@@ -1,19 +1,22 @@
-requests>=2.31.0
-beautifulsoup4>=4.12.0
-lxml>=4.9.0
+# ── Feature 1: ETL pipeline ──────────────────────────────────────────
+requests==2.32.5
+beautifulsoup4==4.14.3
+lxml==6.0.2
+playwright==1.58.0
 
-# ── Feature 2: RAG pipeline ──
-sentence-transformers>=2.2.0
-faiss-cpu>=1.7.4
-rank-bm25>=0.2.2
-numpy>=1.24.0
-torch>=2.0.0
+# ── Feature 2: RAG pipeline ──────────────────────────────────────────
+sentence-transformers==5.2.3
+faiss-cpu==1.13.2
+rank-bm25==0.2.2
+numpy==2.4.2
+torch==2.10.0
 
-# ── Feature 3: FastAPI backend ──
-fastapi>=0.100.0
-uvicorn[standard]>=0.20.0
-pyyaml>=6.0
-python-dotenv>=1.0.0
+# ── Feature 3: FastAPI backend ───────────────────────────────────────
+fastapi==0.133.1
+uvicorn[standard]==0.41.0
+pydantic==2.12.5
+pyyaml==6.0.3
+python-dotenv==1.2.1
 
-# ── Feature 4: Streamlit frontend ──
-streamlit>=1.30.0
+# ── Feature 4: Streamlit frontend ────────────────────────────────────
+streamlit==1.54.0
