@@ -1,6 +1,6 @@
 # Brown University Course RAG
 
-A Retrieval-Augmented Generation (RAG) system for exploring Brown University course offerings. It scrapes course data from CAB and the Bulletin, builds a hybrid semantic + keyword search index, exposes a FastAPI backend, and provides a Streamlit frontend for natural-language course queries answered by GPT-4o-mini.
+Here I've built a Retrieval-Augmented Generation (RAG) system for exploring Brown University course offerings. It scrapes course data from CAB and the Bulletin, builds a hybrid semantic + keyword search index, exposes a FastAPI backend, and provides a Streamlit frontend for natural-language course queries by leveraging GPT-4o-mini.
 
 ---
 
@@ -10,24 +10,24 @@ A Retrieval-Augmented Generation (RAG) system for exploring Brown University cou
 ┌─────────────────────────────────────────────────────────────────────┐
 │                          ETL Pipeline                               │
 │   run_pipeline.py                                                   │
-│   ┌──────────────┐    ┌──────────────────┐    ┌─────────────────┐  │
-│   │ scraper_cab  │    │ scraper_bulletin  │    │   normalize.py  │  │
-│   │  (JSON API)  │───▶│   (HTML/lxml)    │───▶│  unified schema │  │
-│   └──────────────┘    └──────────────────┘    └────────┬────────┘  │
+│   ┌──────────────┐     ┌──────────────────┐    ┌─────────────────┐  │
+│   │ scraper_cab  │     │ scraper_bulletin │    │  normalize.py   │  │
+│   │  (JSON API)  │───▶│   (HTML/lxml)    │───▶│ unified schema  │  │
+│   └──────────────┘     └──────────────────┘    └────────┬────────┘  │
 │                                                         │           │
-│                                              data/courses.json      │
+│                                                  data/courses.json  │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         Vector Store Build                          │
 │   run_rag.py --build                                                │
-│   ┌────────────────────────────┐    ┌───────────────────────────┐  │
-│   │  embedder.py               │    │  keyword_search.py        │  │
-│   │  BAAI/bge-base-en-v1.5     │    │  BM25Okapi                │  │
-│   │  768-d, L2-normed          │    │  (rank-bm25)              │  │
-│   └────────────┬───────────────┘    └──────────────┬────────────┘  │
-│                │                                    │               │
+│   ┌────────────────────────────┐    ┌───────────────────────────┐   │
+│   │  embedder.py               │    │  keyword_search.py        │   │
+│   │  BAAI/bge-base-en-v1.5     │    │  BM25Okapi                │   │
+│   │  768-d, L2-normed          │    │  (rank-bm25)              │   │
+│   └────────────┬───────────────┘    └──────────────┬────────────┘   │
+│                │                                   │                │
 │   data/faiss.index                    (in-memory, rebuilt on load)  │
 │   data/metadata.pkl                                                 │
 └─────────────────────────────────────────────────────────────────────┘
@@ -36,12 +36,12 @@ A Retrieval-Augmented Generation (RAG) system for exploring Brown University cou
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         FastAPI Backend                             │
 │   app.py  (uvicorn, port 8000)                                      │
-│   ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐   │
-│   │ POST /query │  │  GET /health │  │    GET /evaluate        │   │
-│   │  hybrid.py  │  │ index stats  │  │  p50/p95/p99 latency    │   │
-│   │ generator.py│  └──────────────┘  └────────────────────────┘   │
-│   │ (GPT-4o-mini│                                                   │
-│   │  via OpenAI)│                                                   │
+│   ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐     │
+│   │ POST /query │  │  GET /health │  │    GET /evaluate       │     │
+│   │  hybrid.py  │  │ index stats  │  │  p50/p95/p99 latency   │     │ 
+│   │ generator.py│  └──────────────┘  └────────────────────────┘     │
+│   │(GPT-4o-mini │                                                   │
+│   │ via OpenAI) │                                                   │
 │   └─────────────┘                                                   │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
@@ -50,7 +50,7 @@ A Retrieval-Augmented Generation (RAG) system for exploring Brown University cou
 │                       Streamlit Frontend                            │
 │   frontend/app.py  (port 8501)                                      │
 │   Query input · Department dropdown · Source filter                 │
-│   LLM answer box · Results table · Latency badge                   │
+│   LLM answer box · Results table · Latency badge                    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -139,21 +139,14 @@ All variables can also be set in `config.yaml` (env vars take precedence).
 ---
 
 ### 2. Machine learning
-**Query:** `machine learning`
+**Query:** `What are some machine learning courses that are available?`
 
 **Expected answer excerpt:**
 > BHDS2130 (Methods III: Statistical Machine Learning), CSCI1410 (Artificial Intelligence), and APMA2070 (Deep Learning for Scientists & Engineers) cover machine learning topics...
 
 ---
 
-### 3. Department-filtered query
-**Query:** `programming` + **Department filter:** `Computer Science`
-
-**Expected:** All results have `department = "Computer Science"`.
-
----
-
-### 4. Schedule-aware query
+### 3. Schedule-aware query
 **Query:** `List all CAB courses taught on Fridays after 3 pm related to machine learning`
 
 **Expected answer excerpt:**
