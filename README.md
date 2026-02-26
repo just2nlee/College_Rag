@@ -201,7 +201,7 @@ Neither method alone is perfect. Semantic search might miss an exact course code
 - **Affordable:** At ~$0.15 per million output tokens, a typical query costs a fraction of a cent.
 - **Reliable:** OpenAI's API has high uptime and consistent quality.
 
-**Why not local models?** Running an LLM locally (e.g., via Ollama) would eliminate API costs and keep data private, but requires a powerful GPU and more complex setup. For this project, the simplicity and reliability of OpenAI outweighed those benefits.
+**Why not local models?** Running an LLM locally (e.g., via Ollama) would eliminate API costs and keep data private, but requires a powerful GPU and more complex setup at scale. For this project, the simplicity and reliability of OpenAI outweighed those benefits.
 
 ### Streamlit Frontend
 **Decision:** Streamlit over React for minimal setup (no build step, no Node.js required).  
