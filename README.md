@@ -186,7 +186,7 @@ Neither method alone is perfect. Semantic search might miss an exact course code
 
 **Why this model?** Embeddings are how the system understands similarity. When you search "machine learning courses," the system compares your query's fingerprint against every course's fingerprint to find the closest matches.
 
-- **Why `bge-base` specifically?** It's a well-tested model designed specifically for search tasks (not general chat), so it's better at finding relevant documents. It's also free and runs locally—no API calls needed.
+- **Why `bge-base` specifically?** It's a well-tested model designed specifically for search tasks (not general chat), so it's better at finding relevant documents. It's also free and runs locally. Therefore, it doesn't require any API calls.
 - **Why not a bigger model?** Larger models (like `bge-large` or OpenAI's `text-embedding-3-large`) are slightly more accurate but take longer to process and use more memory. For ~500 courses, `bge-base` is plenty accurate and keeps searches fast (under 50ms).
 
 ### In-process FAISS Index
